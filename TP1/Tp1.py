@@ -5,7 +5,7 @@ def main(): #!esto es temporal
     datos = [] 
     datos = lecturaBin()
     PMT,cuentaBin = armarMt(datos)
-    print(cuentaBin)
+    #print(cuentaBin)
     print(PMT)
     calculoEntriopia(cuentaBin)
 
@@ -25,7 +25,7 @@ def main(): #!esto es temporal
 def lecturaBin(): 
     datos = []
     try:
-        with open("Tp1/Samples/tp1_sample1.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
+        with open("Tp1/Samples/tp1_sample2.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
             byte = archivo.read(1)
             while byte:
                 for i in range(8):
@@ -58,7 +58,6 @@ def calculoEntriopia(cuentaBin):
     return None
 
 
-
-
+ 
 if __name__ == "__main__":
     main()
