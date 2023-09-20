@@ -11,15 +11,19 @@ def main(): #!esto es temporal
     diccionario = Counter(datos) 
     df = frameDeDatos(datos, df)
     alfabeto = creaAlfabeto(df)
-    print(alfabeto)
+    print("Alfabeto: ",alfabeto)
     E = calcEntriopia(df,alfabeto)
-    print(E)
-    print(calcLong(df))
-    
+    print("Entropia:" ,E)
+    print("longitud media: ",calcLong(df))
+    if (Kraft(len(alfabeto), df)): 
+        print("El codigo cumple con la inecucacion de Kraft")
+    else:
+        print("El codigo no cumple con la inecucacion de Kraft")
+    print(compact(df, len(alfabeto)))
     
 def lecturaBin(): 
     try:
-        archivo = open("TP2/Samples/tp2_sample0.txt") #todo: agregar el sys.arg[2]
+        archivo = open("TP2/Samples/tp2_sample6.txt") #todo: agregar el sys.arg[2]
         datos = archivo.read()
         data = datos.split(" ")        
         archivo.close()
@@ -64,7 +68,21 @@ def calcLong(df):
         cant += 1
     return sum/cant
 
+def Kraft(r, df): 
+    kf = 0
+    for word in df["palabras"]: 
+        kf += (1/r)**len(word)
+    print(kf)
+    return (kf<=1)
 
+def compact(df, r): 
+    rep = 0
+    for word in df["palabras"]: 
+        if (len(word)> round(ma.log(1/df["probabilidad"][rep],r))): 
+            print("me fui")
+            return False
+        rep += 1
+    return True
 
 if __name__ == "__main__":
     main()
