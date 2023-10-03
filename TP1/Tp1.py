@@ -1,14 +1,7 @@
 import sys
 import numpy as np
-
-def main(): #!esto es temporal
-    datos = [] 
-    datos = lecturaBin()
-    PMT,cuentaBin = armarMt(datos)
-    #print(cuentaBin)
-    print(PMT)
-    calculoEntriopia(cuentaBin)
-
+import math as ma
+N = 2 #!sacar
 
 #    if len(sys.argv) < 2: 
 #        print("cabecera de archivo invalida") 
@@ -19,13 +12,28 @@ def main(): #!esto es temporal
 #            N = int(sys.argv[2])
 #        lecturaBin(filename)
 
-
+def main(): #!esto es temporal
+    datos = [] 
+    datos = lecturaBin()
+    PMT,cuentaBin = armarMt(datos)
+    #print(cuentaBin)
+    print("matriz de probabilidad condicional: ")
+    print(PMT)
+    E = calculoEntropia(cuentaBin)
+    print("Entropia: ", E)
+    if memoriaNoNull(PMT): 
+        print("La fuente es de memoria nula: ", E*N)
+    else:
+        print("La fuente es de memoria no nula")
+        calculoVEst(PMT)
+        
+    
 
 #* Lectura de arch binario
 def lecturaBin(): 
     datos = []
     try:
-        with open("Tp1/Samples/tp1_sample2.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
+        with open("Tp1/Samples/tp1_sample6.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
             byte = archivo.read(1)
             while byte:
                 for i in range(8):
@@ -51,12 +59,23 @@ def armarMt(datos):
     PMT[:,1] = (MT[:,1] / C1)
     return PMT, cuentaBin
 
-def calculoEntriopia(cuentaBin): 
+def calculoEntropia(cuentaBin): 
     totS = sum(cuentaBin) 
-    entropia = cuentaBin / totS
-    print(entropia)
-    return None
+    prob = cuentaBin / totS
+    entropia = 0
+    for i in range(len(prob)): 
+        entropia += prob[i]*ma.log2(1/prob[i])
+    return entropia
 
+def memoriaNoNull(PMT): 
+    if np.allclose(PMT[0,0], PMT[0,1], atol=0.02)  and  np.allclose(PMT[1,0], PMT[1,1], atol=0.02):
+        return True
+    else: 
+        return False
+
+def calculoVEst(PMT): 
+    
+    return None
 
  
 if __name__ == "__main__":
