@@ -19,8 +19,14 @@ def main(): #!esto es temporal
         print("El codigo cumple con la inecucacion de Kraft")
     else:
         print("El codigo no cumple con la inecucacion de Kraft")
-    print(compact(df, len(alfabeto)))
-    print(inst(df))
+    if compact(df, len(alfabeto)):
+        print("El codigo es compacto") 
+    else: 
+        print("El codigo NO es compacto") 
+    if inst(df): 
+        print("El codigo es instantaneo") 
+    else: 
+        print("El codigo NO es instantaneo") 
     
 def lecturaBin(): 
     try:

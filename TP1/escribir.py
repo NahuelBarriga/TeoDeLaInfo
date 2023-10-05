@@ -1,16 +1,12 @@
-import random
+import numpy as np
 
-# Definir la cantidad de unos y ceros que deseas generar
-cantidad_unos = 50
-cantidad_ceros = 50
+numeros_binarios = np.zeros((8, 2))
 
-# Generar una lista de unos y ceros aleatorios
-datos = [random.choice([0, 1]) for _ in range(cantidad_unos + cantidad_ceros)]
+for i in range(8):
+    decimal = i
+    binario = str(bin(i)[2:].zfill(3))  # Convierte el número en binario y asegura una longitud de 4 caracteres con ceros a la izquierda
+    print((binario))
+    numeros_binarios[i, 0] = str(decimal)
+    numeros_binarios[i, 1] = str(binario)
 
-# Definir el nombre del archivo binario
-
-# Escribir los datos en el archivo binario
-with open("Tp1/datos_binarios.bin", "wb") as archivo:
-    archivo.write(bytes(datos))
-
-print(f"Se ha generado")
+print(numeros_binarios)

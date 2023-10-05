@@ -1,7 +1,8 @@
 import sys
 import numpy as np
 import math as ma
-N = 2 #!sacar
+np.set_printoptions(precision=5, suppress=True)
+N = 3 #!sacar
 
 #    if len(sys.argv) < 2: 
 #        print("cabecera de archivo invalida") 
@@ -19,16 +20,20 @@ def main(): #!esto es temporal
     #print(cuentaBin)
     print("matriz de probabilidad condicional: ")
     print(PMT)
-    E = calculoEntropia(cuentaBin)
+    E, prob = calculoEntropia(cuentaBin)
+    print("probabilidades: ", prob)
     print("Entropia: ", E)
     if memoriaNoNull(PMT): 
-        print("La fuente es de memoria nula: ", E*N)
+        prob, E = EntropiaN(prob, N)
+        print("matriz de probabilidades: ")
+        print(prob)
+        print("Entropia de orden N: ", E)
+
+
     else:
         print("La fuente es de memoria no nula")
         calculoVEst(PMT)
         
-    
-
 #* Lectura de arch binario
 def lecturaBin(): 
     datos = []
@@ -65,7 +70,27 @@ def calculoEntropia(cuentaBin):
     entropia = 0
     for i in range(len(prob)): 
         entropia += prob[i]*ma.log2(1/prob[i])
-    return entropia
+    return entropia,prob
+
+def EntropiaN(prob, N): 
+    E = 0
+    probN = np.zeros((2**N, 2))
+
+    for i in range(probN.shape[0]): 
+        posFis = i
+        i2 = i
+        posBin = bin(posFis)[2:].zfill(N)
+        posFis = bin(i2)[2:].zfill(N)
+        probI = 1
+        for j in range(len(posBin)):
+            bit = int(posBin[j])
+            probI *= prob[bit]
+        probN[i,0] = (posFis)
+        probN[i,1] = probI
+
+    for i in range(probN.shape[0]): 
+        E += probN[i,1] * ma.log2(1/probN[i,1])
+    return probN, E
 
 def memoriaNoNull(PMT): 
     if np.allclose(PMT[0,0], PMT[0,1], atol=0.02)  and  np.allclose(PMT[1,0], PMT[1,1], atol=0.02):
