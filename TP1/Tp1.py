@@ -1,9 +1,8 @@
 import sys
 import numpy as np
 import math as ma
-np.set_printoptions(precision=5, suppress=True)
 N = 3 #!sacar
-
+#np.set_printoptions(precision=5, suppress=True) 
 #    if len(sys.argv) < 2: 
 #        print("cabecera de archivo invalida") 
 #        return
@@ -12,6 +11,10 @@ N = 3 #!sacar
 #        if (len(sys.argv)==3 and sys.argv[2] > 0):
 #            N = int(sys.argv[2])
 #        lecturaBin(filename)
+
+def custom_formatter(x):
+    return f"'{x:0{N}str}'"  
+np.set_printoptions(precision=5, suppress=True, formatter={'str': custom_formatter})
 
 def main(): #!esto es temporal
     datos = [] 
@@ -24,21 +27,21 @@ def main(): #!esto es temporal
     print("probabilidades: ", prob)
     print("Entropia: ", E)
     if memoriaNoNull(PMT): 
+        print("La fuente de memoria es nula")
         prob, E = EntropiaN(prob, N)
         print("matriz de probabilidades: ")
         print(prob)
         print("Entropia de orden N: ", E)
 
-
     else:
         print("La fuente es de memoria no nula")
-        calculoVEst(PMT)
+        print("Vector estacionario: ",calculoVEst(PMT))
         
 #* Lectura de arch binario
 def lecturaBin(): 
     datos = []
     try:
-        with open("Tp1/Samples/tp1_sample6.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
+        with open("Tp1/Samples/tp1_sample1.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
             byte = archivo.read(1)
             while byte:
                 for i in range(8):
@@ -78,14 +81,13 @@ def EntropiaN(prob, N):
 
     for i in range(probN.shape[0]): 
         posFis = i
-        i2 = i
+        posStr = "{:0{width}b}".format(posFis, width=N)
         posBin = bin(posFis)[2:].zfill(N)
-        posFis = bin(i2)[2:].zfill(N)
         probI = 1
         for j in range(len(posBin)):
             bit = int(posBin[j])
             probI *= prob[bit]
-        probN[i,0] = (posFis)
+        probN[i,0] = posStr
         probN[i,1] = probI
 
     for i in range(probN.shape[0]): 
@@ -99,9 +101,17 @@ def memoriaNoNull(PMT):
         return False
 
 def calculoVEst(PMT): 
-    
-    return None
+    Ve = [1.0 / PMT.shape[0]] * PMT.shape[0]
+    max_iteraciones = 100
+    for _ in range(max_iteraciones):
+        VeAnt = Ve.copy()
+        Ve = [
+            np.round(sum(PMT[i][j] * VeAnt[j] for j in range(PMT.shape[0])), decimals = 5)
+            for i in range(PMT.shape[0])
+        ]
+        if np.allclose(Ve, VeAnt, atol = 1e-5):
+            break
+    return Ve
 
- 
 if __name__ == "__main__":
     main()
