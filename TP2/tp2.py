@@ -8,7 +8,6 @@ def main(): #!esto es temporal
     datos = [] 
     df = pd.DataFrame(columns=["palabras", "apariciones", "probabilidad"])
     datos = lecturaBin()
-    diccionario = Counter(datos) 
     df = frameDeDatos(datos, df)
     alfabeto = creaAlfabeto(df)
     print("Alfabeto: ",alfabeto)
@@ -16,17 +15,18 @@ def main(): #!esto es temporal
     print("Entropia:" ,E)
     print("longitud media: ",calcLong(df))
     if (Kraft(len(alfabeto), df)): 
-        print("El codigo cumple con la inecucacion de Kraft")
+        print("El codigo cumple con la inecuacion de Kraft")
+        if inst(df): 
+            print("El codigo es instantaneo") 
+        else: 
+            print("El codigo NO es instantaneo")
     else:
-        print("El codigo no cumple con la inecucacion de Kraft")
+        print("El codigo no cumple con la inecuacion de Kraft")
     if compact(df, len(alfabeto)):
         print("El codigo es compacto") 
     else: 
         print("El codigo NO es compacto") 
-    if inst(df): 
-        print("El codigo es instantaneo") 
-    else: 
-        print("El codigo NO es instantaneo") 
+     
     
 def lecturaBin(): 
     try:
@@ -64,12 +64,9 @@ def calcEntriopia(df, alfabeto):
     return E
 
 def calcLong(df): 
-    sum = 0
-    cant = 0
-    for word in df["palabras"]:  
-        sum += len(word)
-        cant += 1
-    return sum/cant
+    prom = 0
+    prom = (df["palabras"].str.len() * df["probabilidad"]).sum()
+    return prom
 
 def Kraft(r, df):
     kf = 0
