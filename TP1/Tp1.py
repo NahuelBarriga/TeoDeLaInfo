@@ -1,47 +1,54 @@
 import sys
 import numpy as np
 import math as ma
-N = 3 #!sacar
 #np.set_printoptions(precision=5, suppress=True) 
-#    if len(sys.argv) < 2: 
-#        print("cabecera de archivo invalida") 
-#        return
-#    else: 
-#        filename = sys.argv[2] 
-#        if (len(sys.argv)==3 and sys.argv[2] > 0):
-#            N = int(sys.argv[2])
-#        lecturaBin(filename)
 
 def custom_formatter(x):
     return f"'{x:0{N}str}'"  
 np.set_printoptions(precision=5, suppress=True, formatter={'str': custom_formatter})
 
-def main(): #!esto es temporal
-    datos = [] 
-    datos = lecturaBin()
-    PMT,cuentaBin = armarMt(datos)
-    #print(cuentaBin)
-    print("matriz de probabilidad condicional: ")
-    print(PMT)
-    E, prob = calculoEntropia(cuentaBin)
-    print("probabilidades: ", prob)
-    print("Entropia: ", E)
-    if memoriaNoNull(PMT): 
-        print("La fuente de memoria es nula")
-        prob, E = EntropiaN(prob, N)
-        print("matriz de probabilidades: ")
-        print(prob)
-        print("Entropia de orden N: ", E)
 
-    else:
-        print("La fuente es de memoria no nula")
-        print("Vector estacionario: ",calculoVEst(PMT))
+def main(): 
+    if len(sys.argv) < 2: 
+        print("cabecera de archivo invalida") 
+    else: 
+        filename = sys.argv[1] 
+        if (len(sys.argv)==3):
+            N = int(sys.argv[2])
+        else: 
+            N=0
+        ejecuta(filename, N)
+       
+
+
+def ejecuta(filename, N): #!esto es temporal
+    datos = [] 
+    datos = lecturaBin(filename)
+    if datos:
+        PMT,cuentaBin = armarMt(datos)
+
+        #print(cuentaBin)
+        print("matriz de probabilidad condicional: ")
+        print(PMT)
+        E, prob = calculoEntropia(cuentaBin)
+        print("probabilidades: ", prob)
+        print("Entropia: ", E)
+        if memoriaNoNull(PMT): 
+            print("La fuente de memoria es nula")
+            if (N>0): 
+                prob, E = EntropiaN(prob, N)
+                print("matriz de probabilidades: ")
+                print(prob)
+                print("Entropia de orden N: ", E)
+        else:
+            print("La fuente es de memoria no nula")
+            print("Vector estacionario: ",calculoVEst(PMT))
         
 #* Lectura de arch binario
-def lecturaBin(): 
+def lecturaBin(filename): 
     datos = []
     try:
-        with open("Tp1/Samples/tp1_sample1.bin", "rb") as archivo: #todo: agregar el sys.arg[2]
+        with open("Samples/" + filename, "rb") as archivo: #todo: agregar el sys.arg[2]
             byte = archivo.read(1)
             while byte:
                 for i in range(8):
@@ -49,7 +56,7 @@ def lecturaBin():
                 byte = archivo.read(1)
         return datos
     except FileNotFoundError: 
-        print("El archivo {filename} no existe") 
+        print("El archivo" ,filename ,"no existe") 
         return None
 
 def armarMt(datos):
@@ -115,3 +122,4 @@ def calculoVEst(PMT):
 
 if __name__ == "__main__":
     main()
+

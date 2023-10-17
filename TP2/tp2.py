@@ -4,39 +4,48 @@ from collections import Counter
 import pandas as pd 
 import math as ma
 
-def main(): #!esto es temporal
+def main(): 
+    if len(sys.argv) < 2: 
+        print("cabecera de archivo invalida") 
+    else: 
+        filename = sys.argv[1] 
+        ejecuta(filename)
+
+
+def ejecuta(filename): 
     datos = [] 
     df = pd.DataFrame(columns=["palabras", "apariciones", "probabilidad"])
-    datos = lecturaBin()
-    df = frameDeDatos(datos, df)
-    alfabeto = creaAlfabeto(df)
-    print("Alfabeto: ",alfabeto)
-    E = calcEntriopia(df,alfabeto)
-    print("Entropia:" ,E)
-    print("longitud media: ",calcLong(df))
-    if (Kraft(len(alfabeto), df)): 
-        print("El codigo cumple con la inecuacion de Kraft")
-        if inst(df): 
-            print("El codigo es instantaneo") 
+    datos = lecturaBin(filename)
+    if datos:
+        df = frameDeDatos(datos, df)
+        alfabeto = creaAlfabeto(df)
+        print("Alfabeto: ",alfabeto)
+        E = calcEntriopia(df,alfabeto)
+        print("Entropia:" ,E)
+        print("longitud media: ",calcLong(df))
+        if (Kraft(len(alfabeto), df)): 
+            print("El codigo cumple con la inecuacion de Kraft")
+            if inst(df): 
+                print("El codigo es instantaneo") 
+            else: 
+                print("El codigo NO es instantaneo")
+        else:
+            print("El codigo no cumple con la inecuacion de Kraft")
+        if compact(df, len(alfabeto)):
+            print("El codigo es compacto") 
         else: 
-            print("El codigo NO es instantaneo")
-    else:
-        print("El codigo no cumple con la inecuacion de Kraft")
-    if compact(df, len(alfabeto)):
-        print("El codigo es compacto") 
-    else: 
-        print("El codigo NO es compacto") 
+            print("El codigo NO es compacto") 
      
     
-def lecturaBin(): 
+def lecturaBin(filename): 
     try:
-        archivo = open("TP2/Samples/tp2_sample0.txt") #todo: agregar el sys.arg[2]
+        archivo = open("Samples/" + filename)
         datos = archivo.read()
         data = datos.split(" ")        
         archivo.close()
         return data
     except FileNotFoundError: 
-        print("El archivo {filename} no existe") 
+        print("El archivo" ,filename, "no existe") 
         return None
 
 def frameDeDatos(datos, df): 
