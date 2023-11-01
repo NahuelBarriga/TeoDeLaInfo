@@ -48,7 +48,7 @@ def ejecuta(filename, N): #!esto es temporal
 def lecturaBin(filename): 
     datos = []
     try:
-        with open("Samples/" + filename, "rb") as archivo: #todo: agregar el sys.arg[2]
+        with open("Samples/" + filename, "rb") as archivo: 
             byte = archivo.read(1)
             while byte:
                 for i in range(8):
