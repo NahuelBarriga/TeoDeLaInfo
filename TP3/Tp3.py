@@ -17,9 +17,7 @@ def encode(data):
 
     if current_str in dictionary:
         result.append(dictionary[current_str])
-
     
-    print(dictionary)
     return result
 
 
@@ -29,27 +27,24 @@ def decode(data):
     dictionary = {i: chr(i) for i in range(256)}
     current_code = 256
     result = []
-    entry = ""
-    previous_code = data[0]
-    print(data)
+    previous_code = (data[1]) | (data[0]) << 8
+    entry = dictionary[previous_code]
+    result.append(dictionary[previous_code]) #inserta el primer caracter 
 
-    result.append(dictionary[previous_code])
-
-    for code in data[1:]:
+    for i in range(2, len(data), 2):
+        code = data[i+1] | data[i] << 8
         if code in dictionary:
             current_entry = dictionary[code]
         elif code == current_code:
             current_entry = entry + entry[0]
-        else:
-            raise ValueError("Bad compressed code")
 
+            
         result.append(current_entry)
 
         dictionary[current_code] = entry + current_entry[0]
         current_code += 1
         entry = current_entry
 
-    print(dictionary)
     return "".join(result)
 
 
@@ -78,7 +73,9 @@ def main():
         print("Tasa de compresión: {}%".format(100 * compressed_size / original_size))
     elif action == "-d":
         with open("TP3/" + compressed_file, "rb") as f:
-            data = f.read()
+            data = f.read().hex()
+
+        data = bytes.fromhex(data)
 
         decoded = decode(data)
         with open("TP3/" + original_file, "w", encoding='utf-8') as f:
