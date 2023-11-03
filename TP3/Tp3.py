@@ -47,6 +47,12 @@ def decode(data):
 
     return "".join(result)
 
+def metricas(original_file,compressed_file): 
+    original_size = os.path.getsize("TP3/Samples/" + original_file)
+    compressed_size = os.path.getsize("TP3/" + compressed_file)
+    red = (original_size - compressed_size) / original_size
+    return compressed_size / original_size, red
+
 
 def main():
     args = sys.argv
@@ -67,10 +73,13 @@ def main():
             for i in encoded:
                 f.write(i.to_bytes(2, byteorder='big'))
 
-        original_size = os.path.getsize("TP3/Samples/" + original_file)
-        compressed_size = os.path.getsize("TP3/" + compressed_file)
+        compRatio,red = metricas(original_file,compressed_file)
+    
+        
 
-        print("Tasa de compresión: {}%".format(100 * compressed_size / original_size))
+        print("Tasa de compresión: {}%".format(100 * compRatio))
+        print("Redundancia :", red)                                 #!no esta bien esto, que hay buscar bine como se hace
+       
     elif action == "-d":
         with open("TP3/" + compressed_file, "rb") as f:
             data = f.read().hex()
