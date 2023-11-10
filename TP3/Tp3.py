@@ -48,8 +48,8 @@ def decode(data):
     return "".join(result)
 
 def metricas(original_file,compressed_file): 
-    original_size = os.path.getsize("TP3/Samples/" + original_file)
-    compressed_size = os.path.getsize("TP3/" + compressed_file)
+    original_size = os.path.getsize("Samples/" + original_file)
+    compressed_size = os.path.getsize(compressed_file)
     red = (original_size - compressed_size) / original_size
     return compressed_size / original_size, red
 
@@ -66,10 +66,10 @@ def main():
     compressed_file = args[2]
 
     if action == "-c":
-        with open("TP3/Samples/" + original_file, "r") as f:
+        with open("Samples/" + original_file, "r") as f:
             data = str(f.read())
         encoded = encode(data)
-        with open("TP3/" + compressed_file, 'wb') as f:
+        with open(compressed_file, 'wb') as f:
             for i in encoded:
                 f.write(i.to_bytes(2, byteorder='big'))
 
@@ -81,13 +81,13 @@ def main():
         print("Redundancia :", red)                                 #!no esta bien esto, que hay buscar bine como se hace
        
     elif action == "-d":
-        with open("TP3/" + compressed_file, "rb") as f:
+        with open(compressed_file, "rb") as f:
             data = f.read().hex()
 
         data = bytes.fromhex(data)
 
         decoded = decode(data)
-        with open("TP3/" + original_file, "w", encoding='utf-8') as f:
+        with open(original_file, "w", encoding='utf-8') as f:
             f.write(decoded)
 
 if __name__ == "__main__":
