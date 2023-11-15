@@ -20,7 +20,7 @@ def ejecuta(filename):
         df = frameDeDatos(datos, df)
         alfabeto = creaAlfabeto(df)
         print("Alfabeto: ",alfabeto)
-        E = calcEntriopia(df,alfabeto)
+        E = calcEntropia(df,alfabeto)
         print("Entropia:" ,E)
         print("longitud media: ",calcLong(df))
         if (Kraft(len(alfabeto), df)): 
@@ -56,6 +56,7 @@ def frameDeDatos(datos, df):
         nwRow = {"palabras": key, "apariciones": diccionario[key], "probabilidad": diccionario[key]/tot}
         df = df._append(nwRow, ignore_index = True)
     print(df)
+
     return df
 
 def creaAlfabeto(df): 
@@ -65,7 +66,7 @@ def creaAlfabeto(df):
     return alfabeto.keys()
 
 #Prob * Log(en base a la cantidad de simbolos) (1 / prob)
-def calcEntriopia(df, alfabeto): 
+def calcEntropia(df, alfabeto): 
     base = len(alfabeto)
     E = 0
     for pro in df["probabilidad"]:

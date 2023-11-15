@@ -1,5 +1,8 @@
 import sys
 import os
+import pandas as pd
+from collections import Counter
+import math as ma
 
 def encode(data):
 
@@ -48,10 +51,42 @@ def decode(data):
     return "".join(result)
 
 def metricas(original_file,compressed_file): 
+    df = pd.DataFrame(columns=["palabras", "apariciones", "probabilidad"])
+    df = frameDeDatos(compressed_file, df)
+    E,L = calcDatos(df)
+    # print(E)
+    # print(L)
     original_size = os.path.getsize("Samples/" + original_file)
     compressed_size = os.path.getsize(compressed_file)
-    red = (original_size - compressed_size) / original_size
-    return compressed_size / original_size, red
+    efi = E/L
+
+    return compressed_size / original_size, efi
+
+def calcDatos(df): 
+    base = 10                                           #todo: preguntar a franco
+    largoCod = 2                                       #todo: preguntar a franco
+    L = 0
+    E = 0
+    for pro in df["probabilidad"]:
+        E += (pro * ma.log(1/pro,base))
+    E = E/ma.log2(10)
+    for pro in df["probabilidad"]:
+        L += pro*largoCod
+    return E,L
+
+def frameDeDatos(compressed_file, df): 
+    data = []
+    with open(compressed_file, "rb") as f:
+        data = f.read().hex()
+    data = bytes.fromhex(data)
+    array_de_hex = [int(data[i+1] | data[i] << 8) for i in range(0, len(data), 2)]
+    #print([int(array_de_hex[i]) for i in range(20)])
+    diccionario = Counter(array_de_hex)
+    tot = diccionario.total()
+    for key in diccionario: 
+        nwRow = {"palabras": key, "apariciones": diccionario[key], "probabilidad": diccionario[key]/tot}
+        df = df._append(nwRow, ignore_index = True)
+    return df
 
 
 def main():
@@ -73,12 +108,12 @@ def main():
             for i in encoded:
                 f.write(i.to_bytes(2, byteorder='big'))
 
-        compRatio,red = metricas(original_file,compressed_file)
+        compRatio,efi = metricas(original_file,compressed_file)
     
         
 
         print("Tasa de compresión: {}%".format(100 * compRatio))
-        print("Redundancia :", red)                                 #!no esta bien esto, que hay buscar bine como se hace
+        print("Eficiencia :", efi)                                 #!no esta bien esto, que hay buscar bien como se hace
        
     elif action == "-d":
         with open(compressed_file, "rb") as f:
