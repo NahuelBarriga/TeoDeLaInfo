@@ -62,6 +62,12 @@ def generaMensajes(N, M, probF_E):
     return msn
 
 
+def metodoParidadCruzada(mensajes, criterio):
+    paridades = copy.deepcopy(mensajes)
+
+    return paridades
+
+
 def main():
     args = sys.argv
 
@@ -113,9 +119,9 @@ def main():
     #! a chequear: supuestamente hay q pasar cada mensaje por la matriz del canal, para q? como?
     mensajes = generaMensajes(N, M, probF_E)
 
-    #! paridad cruzada criterio par = 0 si la suma de ceros de vrc y lrc es par ?
+    #! paridad cruzada con criterio par: = 0 si la suma de ceros de vrc y lrc es par ?
     if action == "-p":
-        Mat_Paridades = metodoParidadCruzada(mat_canal, mensajes)
+        Mat_Paridades = metodoParidadCruzada(mensajes, criterio)
 
     print("probFE:", probFE)
     print("Matriz:", matriz)
