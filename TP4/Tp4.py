@@ -26,11 +26,11 @@ def calc_entropia_Apriori(probF_E, probF_S):
 
     for p in probF_E:
         if p != 0:
-            entropia_A += p * m.log(1 / p)
+            entropia_A += p * m.log2(1 / p)
 
     for p in probF_S:
         if p != 0:
-            entropia_B += p * m.log(1 / p)
+            entropia_B += p * m.log2(1 / p)
 
     return entropia_A, entropia_B
 
@@ -40,10 +40,10 @@ def calc_entropia_Aposteriori(probF, mat_canal, prob_condicionales):
     E1 = 0
     for i in range(2):
         if prob_condicionales[0][i] != 0:
-            E0 += prob_condicionales[0][i] * m.log(1 / prob_condicionales[0][i])
+            E0 += prob_condicionales[0][i] * m.log2(1 / prob_condicionales[0][i])
     for j in range(2):
         if prob_condicionales[1][j] != 0:
-            E1 += prob_condicionales[1][j] * m.log(1 / prob_condicionales[1][j])
+            E1 += prob_condicionales[1][j] * m.log2(1 / prob_condicionales[1][j])
     return E0, E1
 
 
@@ -60,14 +60,16 @@ def calc_equivocacion(prob_suceso_simul, prob_condicionales):
     for i in range(2):
         for j in range(2):
             if prob_condicionales[i][j] != 0:
-                Hab += prob_suceso_simul[i][j] * m.log(1 / prob_condicionales[i][j])
+                Hab += prob_suceso_simul[i][j] * m.log2(1 / prob_condicionales[i][j])
     return Hab
 
 
 def generaMensajes(N, M, probF_E):
-    msn = [[0 for _ in range(len(M))] for _ in range(len(N))]
-    for i in range(len(N)):
-        for j in range(len(M)):
+    N = int(N)
+    M = int(M)
+    msn = [[0 for _ in range(M)] for _ in range(N)]
+    for i in range(N):
+        for j in range(M):
             msn[i][j] = 0 if random.random() <= probF_E[0] else 1
     return msn
 
@@ -76,21 +78,13 @@ def metodoParidadCruzada(mensajes, N, M):
     paridades = copy.deepcopy(mensajes)
     N = int(N)
     M = int(M)
-    for i in range(N):
-        cant = 0
-        for j in range(M):
-            cant += paridades[i][j]
-        if cant % 2 == 0:
-            paridades[i].append(0)
-        else:
-            paridades[i].append(1)
 
-    for j in range(M):
-        cant = sum(paridades[i][j] for i in range(N))
-        if cant % 2 == 0:
-            paridades.append([0])
-        else:
-            paridades.append([1])
+    for i in range(N):
+        cant = sum(paridades[i][j] for j in range(M))
+        paridades[i].append(0 if cant % 2 == 0 else 1)
+
+    paridad_columna = sum(paridades[i][-1] for i in range(N))
+    paridades.append([0 if paridad_columna % 2 == 0 else 1] * (M + 1))
 
     return paridades
 
@@ -99,6 +93,10 @@ def enviaMensajes(matriz, mat_canal):
     filas = len(matriz)
     columnas = len(matriz[0]) if filas > 0 else 0
     msn = []
+
+    for _ in range(filas):
+        msn.append([0] * columnas)
+
     for i in range(filas):
         for j in range(columnas):
             x = random.random()
@@ -117,11 +115,14 @@ def main():
     arch = args[2]
     N = args[3]
     M = args[4]
-    action = args[5]
+    if len(args) == 6:
+        action = args[5]
+    else:
+        action = ""
 
     mat_canal = []
 
-    probF_E = [0, 0]
+    probF_E = []
 
     #!a chequear
     with open("Samples/" + arch, "r") as f:
@@ -155,24 +156,24 @@ def main():
     # I(A,B) = I (B,A)
     info_mutua = entropia_Apriori_A - equivocacion
 
-    print("MATRIZ DEL CANAL: \n", mat_canal)
-    print("PROBABILIDAD DE LA FUENTE DE ENTRADA P(ai): ", probF_E)
-    print("PROBABILIDAD DE LA FUENTE DE SALIDA P(bi): ", probF_S)
-    print("PROBABILIDAD DE SUCESO SIMULTANEO P(ai,bi): \n ", prob_suceso_simul),
+    print("MATRIZ DEL CANAL:  \n", mat_canal)
+    print("PROBABILIDAD DE LA FUENTE DE ENTRADA P(ai): \n", probF_E)
+    print("PROBABILIDAD DE LA FUENTE DE SALIDA P(bi):  \n", probF_S)
+    print("PROBABILIDAD DE SUCESO SIMULTANEO P(ai,bi):  \n", prob_suceso_simul)
 
-    print("PROBABILIDAD CONDICIONAL P(ai/bi):", prob_condicionales)
+    print("PROBABILIDAD CONDICIONAL P(ai/bi): \n", prob_condicionales)
     print(
-        "ENTROPIA APRIORI: H(A) = {}   H(B) = {}".format(
+        "ENTROPIA APRIORI:  H(A) = {:.2f}   H(B) = {:.2f}".format(
             entropia_Apriori_A, entropia_Apriori_B
         )
     )
     print(
-        "ENTROPIA APOSTERIORI: H(A/b=0) = {}   H(A/b=1)= {}".format(
+        "ENTROPIA APOSTERIORI: H(A/b=0) = {:.2f}   H(A/b=1)= {:.2f}".format(
             entropia_Aposteriori_0, entropia_Aposteriori_1
         )
     )
-    print("EQUIVOCACION: H(A/B) = ", equivocacion)
-    print("INFORMACION MUTUA: I(A,B) = ", info_mutua)
+    print("EQUIVOCACION: H(A/B) =  {:.2f} ".format(equivocacion))
+    print("INFORMACION MUTUA: I(A,B) =  {:.2f} ".format(info_mutua))
 
     mensajes = generaMensajes(N, M, probF_E)
 
