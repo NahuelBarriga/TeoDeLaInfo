@@ -107,9 +107,11 @@ def main():
         with open("Samples/" + original_file, "r") as f:
             data = str(f.read())
         encoded = encode(data)
-        with open(compressed_file, "wb") as f:
-            for i in encoded:
-                f.write(i.to_bytes(2, byteorder="big"))
+        largo = len(encoded)
+        print(largo)
+        # with open(compressed_file, "wb") as f:
+        #     for i in encoded:
+        #         f.write(i.to_bytes(2, byteorder="big"))
 
         compRatio, efi = metricas(original_file, compressed_file)
 
