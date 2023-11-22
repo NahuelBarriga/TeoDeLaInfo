@@ -115,10 +115,9 @@ def main():
 
         compRatio, efi = metricas(original_file, compressed_file)
 
-        print("Tasa de compresión: {}%".format(100 * compRatio))
-        print("Eficiencia: {}%".format(100 * efi))
-        print("Redundancia: {}%".format(100 * (1 - efi)))
-
+        print("Tasa de compresión: {:.2f}%".format(round(100 * compRatio, 2)))
+        print("Eficiencia: {:.2f}%".format(round(100 * efi, 2)))
+        print("Redundancia: {:.2f}%".format(round(100 * (1 - efi), 2)))
     elif action == "-d":
         with open(compressed_file, "rb") as f:
             data = f.read().hex()
