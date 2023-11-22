@@ -54,8 +54,6 @@ def metricas(original_file, compressed_file):
     df = pd.DataFrame(columns=["palabras", "apariciones", "probabilidad"])
     df = frameDeDatos(compressed_file, df)
     E = calcDatos(df)
-    # print(E)
-    # print(L)
     original_size = os.path.getsize("Samples/" + original_file)
     compressed_size = os.path.getsize(compressed_file)
     L = (
@@ -63,7 +61,7 @@ def metricas(original_file, compressed_file):
     ) * 8  # todo: Laclarar que es una estimacion pq no se pude hacer de la forma normal
     efi = E / L
 
-    return compressed_size / original_size, efi
+    return  1 - (compressed_size / original_size), efi
 
 
 def calcDatos(df):
