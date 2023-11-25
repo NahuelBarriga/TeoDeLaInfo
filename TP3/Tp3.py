@@ -12,7 +12,7 @@ def encode(data):
     current_str = ""
     for char in data:
         current_str += char
-        if current_str not in dictionary:
+        if current_str not in dictionary: 
             result.append(dictionary[current_str[:-1]])
             dictionary[current_str] = current_code
             current_code += 1
@@ -109,10 +109,11 @@ def main():
         encoded = encode(data)
         largo = len(encoded)
         print(largo)
-        # with open(compressed_file, "wb") as f:
-        #     for i in encoded:
-        #         f.write(i.to_bytes(2, byteorder="big"))
+        with open(compressed_file, "wb") as f:
+            for i in encoded:
+                f.write(i.to_bytes(2, byteorder="big"))
 
+        
         compRatio, efi = metricas(original_file, compressed_file)
 
         print("Tasa de compresión: {:.2f}%".format(round(100 * compRatio, 2)))
@@ -123,7 +124,6 @@ def main():
             data = f.read().hex()
 
         data = bytes.fromhex(data)
-
         decoded = decode(data)
         with open(original_file, "w", encoding="utf-8") as f:
             f.write(decoded)
