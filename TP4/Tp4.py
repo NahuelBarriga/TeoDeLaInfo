@@ -84,36 +84,40 @@ def generaMensajes(N, M, probF_E):
     return msn
 
 
-def metodoParidadCruzada(mensajes, N, M):
-    paridades = copy.deepcopy(mensajes)
+def metodoParidadCruzada(mensajes, N, M, flag):
     N = int(N)
     M = int(M)
 
+    if flag == 0:
+        paridades = copy.deepcopy(mensajes)
+    else:
+        mensajes_cortados = [fila[:M] for fila in mensajes[:N]]
+        paridades = [list(fila) for fila in mensajes_cortados]
+
     for i in range(N):
-        cant = sum(paridades[i][j] for j in range(M))
+        cant = sum(paridades[i])
         paridades[i].append(0 if cant % 2 == 0 else 1)
 
-    nueva_fila = [0] * (M + 1)  # Inicializa una nueva fila con ceros
+    nueva_fila = [0] * (M + 1)  
     for j in range(M + 1):
         cant = sum(paridades[i][j] for i in range(N))
         nueva_fila[j] = 0 if cant % 2 == 0 else 1
+
     paridades.append(nueva_fila)
 
     return paridades
 
 
-def enviaMensajes(matriz, mat_canal):
+def enviaMensajes(matriz, mat_canal, flag):
+    msn = copy.deepcopy(matriz)
     filas = len(matriz)
     columnas = len(matriz[0]) if filas > 0 else 0
-    msn = []
 
-    for _ in range(filas):
-        msn.append([0] * columnas)
-
-    for i in range(filas):
-        for j in range(columnas):
+    for i in range(filas - flag):
+        for j in range(columnas - flag):
             x = random.random()
             msn[i][j] = 0 if random.random() <= mat_canal[matriz[i][j]][0] else 1
+
     return msn
 
 
@@ -135,6 +139,7 @@ def Get_correctos_incorrectos(matriz_A, matriz_B):
 
 
 def Get_correctos_incorrectos_p():
+    
     return
 
 
@@ -242,17 +247,19 @@ def main():
     print("Mensajes a enviar: \n", mensajes)
 
     if action == "-p":
-        Mat_Paridades = metodoParidadCruzada(mensajes, N, M)
+        Mat_Paridades = metodoParidadCruzada(mensajes, N, M, 0)
         print("Mensajes a enviar + paridades: \n", Mat_Paridades)
 
-        msnRecibido = enviaMensajes(mensajes, mat_canal)
-        print("Mensaje recibido: \n", msnRecibido)
+        msnRecibido_paridadesViejas = enviaMensajes(Mat_Paridades, mat_canal, 1)
+        print("Mensaje recibido con paridades viejas: \n", msnRecibido_paridadesViejas)
 
-        msnRecibido_Paridades = metodoParidadCruzada(msnRecibido, N, M)
-        print("Mensaje recibido + paridades: \n", msnRecibido_Paridades)
+        msnRecibido_ParidadesNuevas = metodoParidadCruzada(
+            msnRecibido_paridadesViejas, N, M, 1
+        )
+        print("Mensaje recibido + paridades nuevas: \n", msnRecibido_ParidadesNuevas)
 
     else:
-        msnRecibido = enviaMensajes(mensajes, mat_canal)
+        msnRecibido = enviaMensajes(mensajes, mat_canal, 0)
         print("Mensaje recibido: \n", msnRecibido)
 
         correctos, incorrectos, final = Get_correctos_incorrectos(mensajes, msnRecibido)
