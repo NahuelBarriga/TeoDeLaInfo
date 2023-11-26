@@ -93,8 +93,11 @@ def metodoParidadCruzada(mensajes, N, M):
         cant = sum(paridades[i][j] for j in range(M))
         paridades[i].append(0 if cant % 2 == 0 else 1)
 
-    paridad_columna = sum(paridades[i][-1] for i in range(N))
-    paridades.append([0 if paridad_columna % 2 == 0 else 1] * (M + 1))
+    nueva_fila = [0] * (M + 1)  # Inicializa una nueva fila con ceros
+    for j in range(M + 1):
+        cant = sum(paridades[i][j] for i in range(N))
+        nueva_fila[j] = 0 if cant % 2 == 0 else 1
+    paridades.append(nueva_fila)
 
     return paridades
 
@@ -114,16 +117,25 @@ def enviaMensajes(matriz, mat_canal):
     return msn
 
 
-def msnErroneos(mat_1, mat_2):
-    matriz_a = np.array(mat_1)
-    matriz_b = np.array(mat_2)
+def Get_correctos_incorrectos(matriz_A, matriz_B):
+    filas_iguales = 0
+    filas_diferentes = 0
 
-    for i in range(len(matriz_a)):
-        if not np.array_equal(matriz_a[i], matriz_b[i]):
-            return i
+    for i in range(len(matriz_A)):
+        if matriz_A[i] == matriz_B[i]:
+            filas_iguales += 1
+        else:
+            filas_diferentes += 1
+            # Corregir cada bit diferente en la matriz B
+            for j in range(len(matriz_A[i])):
+                if matriz_A[i][j] != matriz_B[i][j]:
+                    matriz_B[i][j] = matriz_A[i][j]
 
-    # Si todas las filas son iguales, devuelve -1 para indicar que no hay diferencias
-    return -1
+    return filas_iguales, filas_diferentes, matriz_B
+
+
+def Get_correctos_incorrectos_p():
+    return
 
 
 def main():
@@ -186,7 +198,6 @@ def main():
     )
 
     # H(A,B)
-    print("AAAAA", entropia_Apriori_A, equivocacion_BA)
     entropia_Afin = entropia_Apriori_A + equivocacion_BA
 
     # I(A,B) = I (B,A)
@@ -228,19 +239,25 @@ def main():
     print("     I(A,B) =  {:.3f}   I(B,A) =  {:.3f}".format(info_mutuaAB, info_mutuaBA))
 
     mensajes = generaMensajes(N, M, probF_E)
+    print("Mensajes a enviar: \n", mensajes)
 
     if action == "-p":
         Mat_Paridades = metodoParidadCruzada(mensajes, N, M)
-        msnEnviado = enviaMensajes(Mat_Paridades, mat_canal)
-        print("MENSAJES A ENVIAR CON PARIDADES: ", Mat_Paridades)
+        print("Mensajes a enviar + paridades: \n", Mat_Paridades)
+
+        msnRecibido = enviaMensajes(mensajes, mat_canal)
+        print("Mensaje recibido: \n", msnRecibido)
+
+        msnRecibido_Paridades = metodoParidadCruzada(msnRecibido, N, M)
+        print("Mensaje recibido + paridades: \n", msnRecibido_Paridades)
+
     else:
-        msnEnviado = enviaMensajes(mensajes, mat_canal)
-        print("MENSAJES A ENVIAR: ", mensajes)
+        msnRecibido = enviaMensajes(mensajes, mat_canal)
+        print("Mensaje recibido: \n", msnRecibido)
 
-    print("MENSAJE ENVIADO: ", msnEnviado)
-
-    print("CANTIDAD DE MENSAJES INCORRECTOS")
-    print("CANTIDAD DE MENSAJES CORREGIDOS")
+        correctos, incorrectos, final = Get_correctos_incorrectos(mensajes, msnRecibido)
+        print("Mensajes corectos = ", correctos)
+        print("Mensajes incorrectos = ", incorrectos)
 
 
 if __name__ == "__main__":
