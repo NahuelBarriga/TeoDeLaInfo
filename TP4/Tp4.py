@@ -5,7 +5,7 @@ import copy
 import numpy as np
 
 
-def calc_probF_Salida(probF_E, mat_canal):
+def get_probF_Salida(probF_E, mat_canal):
     pfs = [0, 0]
     for i in range(2):
         pfs[i] = probF_E[0] * mat_canal[0][i] + probF_E[1] * mat_canal[1][i]
@@ -13,7 +13,7 @@ def calc_probF_Salida(probF_E, mat_canal):
     return pfs
 
 
-def calc_prob_condicionales(probF_E, probF_S, mat_canal):
+def get_prob_condicionales(probF_E, probF_S, mat_canal):
     pcond = [[0, 0], [0, 0]]
     for i in range(2):
         for j in range(2):
@@ -22,7 +22,7 @@ def calc_prob_condicionales(probF_E, probF_S, mat_canal):
     return pcond
 
 
-def calc_entropia_Apriori(probF_E, probF_S):
+def get_entropia_Apriori(probF_E, probF_S):
     entropia_A = 0
     entropia_B = 0
 
@@ -37,7 +37,7 @@ def calc_entropia_Apriori(probF_E, probF_S):
     return entropia_A, entropia_B
 
 
-def calc_entropia_Aposteriori_A(mat_prob):
+def get_entropia_Aposteriori_A(mat_prob):
     E0 = 0
     E1 = 0
     for i in range(2):
@@ -49,7 +49,7 @@ def calc_entropia_Aposteriori_A(mat_prob):
     return E0, E1
 
 
-def calc_entropia_Aposteriori_B(mat_prob):
+def get_entropia_Aposteriori_B(mat_prob):
     E0 = 0
     E1 = 0
     for i in range(2):
@@ -61,7 +61,7 @@ def calc_entropia_Aposteriori_B(mat_prob):
     return E0, E1
 
 
-def cal_prob_suceso_simul(prob_condicionales, probF_S):
+def get_prob_suceso_simul(prob_condicionales, probF_S):
     pss = [[0, 0], [0, 0]]
     for i in range(2):
         for j in range(2):
@@ -69,7 +69,7 @@ def cal_prob_suceso_simul(prob_condicionales, probF_S):
     return pss
 
 
-def calc_equivocacion(prob_F, entro_Apos_0, entro_Apos_1):
+def get_equivocacion(prob_F, entro_Apos_0, entro_Apos_1):
     equi = prob_F[0] * entro_Apos_0 + prob_F[1] * entro_Apos_1
     return equi
 
@@ -98,7 +98,7 @@ def metodoParidadCruzada(mensajes, N, M, flag):
         cant = sum(paridades[i])
         paridades[i].append(0 if cant % 2 == 0 else 1)
 
-    nueva_fila = [0] * (M + 1)  
+    nueva_fila = [0] * (M + 1)
     for j in range(M + 1):
         cant = sum(paridades[i][j] for i in range(N))
         nueva_fila[j] = 0 if cant % 2 == 0 else 1
@@ -130,7 +130,6 @@ def Get_correctos_incorrectos(matriz_A, matriz_B):
             filas_iguales += 1
         else:
             filas_diferentes += 1
-            # Corregir cada bit diferente en la matriz B
             for j in range(len(matriz_A[i])):
                 if matriz_A[i][j] != matriz_B[i][j]:
                     matriz_B[i][j] = matriz_A[i][j]
@@ -138,9 +137,29 @@ def Get_correctos_incorrectos(matriz_A, matriz_B):
     return filas_iguales, filas_diferentes, matriz_B
 
 
-def Get_correctos_incorrectos_p():
-    
-    return
+def get_discrepancias_paridades(matriz1, matriz2):
+    # Convertir las listas de listas a matrices NumPy
+    matriz1 = np.array(matriz1)
+    matriz2 = np.array(matriz2)
+
+    Fila1 = matriz1[-1]
+    Columna1 = matriz1[:, -1]
+
+    Fila2 = matriz2[-1]
+    Columna2 = matriz2[:, -1]
+
+    discrepancias_filas = np.count_nonzero(Fila1 != Fila2)
+    discrepancias_columnas = np.count_nonzero(Columna1 != Columna2)
+
+    if discrepancias_filas == 1 & discrepancias_columnas == 1:
+        print("Hay un solo error, por ende se corrige")
+
+    elif discrepancias_filas == 0 & discrepancias_columnas == 0:
+        print("Los mensajes fueron enviados correctamente")
+    else:
+        print("Hay mas de un error, imposibilidad de detectarlo y por ende corregirlo")
+
+    return discrepancias_filas, discrepancias_columnas
 
 
 def main():
@@ -170,35 +189,27 @@ def main():
             elif 1 <= i <= 2:
                 mat_canal.append(valores)
 
-    # P(bi)
-    probF_S = calc_probF_Salida(probF_E, mat_canal)
+    probF_S = get_probF_Salida(probF_E, mat_canal)
 
-    # P(ai/bi)
-    prob_condicionales = calc_prob_condicionales(probF_E, probF_S, mat_canal)
+    prob_condicionales = get_prob_condicionales(probF_E, probF_S, mat_canal)
 
-    # H(A), H(B)
-    entropia_Apriori_A, entropia_Apriori_B = calc_entropia_Apriori(probF_E, probF_S)
+    entropia_Apriori_A, entropia_Apriori_B = get_entropia_Apriori(probF_E, probF_S)
 
-    # H(A/b=0), H(A/b=1)  #! tmb con B?
-    A_entropia_Aposteriori_0, A_entropia_Aposteriori_1 = calc_entropia_Aposteriori_A(
+    A_entropia_Aposteriori_0, A_entropia_Aposteriori_1 = get_entropia_Aposteriori_A(
         prob_condicionales
     )
-
-    # H(B/a=0),  H(B/a=1)
-    B_entropia_Aposteriori_0, B_entropia_Aposteriori_1 = calc_entropia_Aposteriori_B(
+    B_entropia_Aposteriori_0, B_entropia_Aposteriori_1 = get_entropia_Aposteriori_B(
         mat_canal
     )
 
-    # P(ai,bi)
-    prob_suceso_simul = cal_prob_suceso_simul(prob_condicionales, probF_S)
+    prob_suceso_simul = get_prob_suceso_simul(prob_condicionales, probF_S)
 
-    # H(A/B)
-    equivocacion_AB = calc_equivocacion(
+    equivocacion_AB = get_equivocacion(
         probF_S, A_entropia_Aposteriori_0, A_entropia_Aposteriori_1
     )
 
     # H(B/A)
-    equivocacion_BA = calc_equivocacion(
+    equivocacion_BA = get_equivocacion(
         probF_E, B_entropia_Aposteriori_0, B_entropia_Aposteriori_1
     )
 
@@ -251,13 +262,15 @@ def main():
         print("Mensajes a enviar + paridades: \n", Mat_Paridades)
 
         msnRecibido_paridadesViejas = enviaMensajes(Mat_Paridades, mat_canal, 1)
-        print("Mensaje recibido con paridades viejas: \n", msnRecibido_paridadesViejas)
+        print("Mensaje recibido + paridades viejas: \n", msnRecibido_paridadesViejas)
 
         msnRecibido_ParidadesNuevas = metodoParidadCruzada(
             msnRecibido_paridadesViejas, N, M, 1
         )
         print("Mensaje recibido + paridades nuevas: \n", msnRecibido_ParidadesNuevas)
-
+        discrepancias_filas, discrepancias_columnas = get_discrepancias_paridades(
+            msnRecibido_paridadesViejas, msnRecibido_ParidadesNuevas
+        )
     else:
         msnRecibido = enviaMensajes(mensajes, mat_canal, 0)
         print("Mensaje recibido: \n", msnRecibido)
@@ -265,6 +278,7 @@ def main():
         correctos, incorrectos, final = Get_correctos_incorrectos(mensajes, msnRecibido)
         print("Mensajes corectos = ", correctos)
         print("Mensajes incorrectos = ", incorrectos)
+        print("Mensajes corregidos = ", incorrectos)
 
 
 if __name__ == "__main__":
