@@ -151,10 +151,9 @@ def get_discrepancias_paridades(matriz1, matriz2):
     discrepancias_filas = np.count_nonzero(Fila1 != Fila2)
     discrepancias_columnas = np.count_nonzero(Columna1 != Columna2)
 
-    if discrepancias_filas == 1 & discrepancias_columnas == 1:
+    if discrepancias_filas == 1 and discrepancias_columnas == 1:
         print("Hay un solo error, por ende se corrige")
-
-    elif discrepancias_filas == 0 & discrepancias_columnas == 0:
+    elif discrepancias_filas == 0 and discrepancias_columnas == 0:
         print("Los mensajes fueron enviados correctamente")
     else:
         print("Hay mas de un error, imposibilidad de detectarlo y por ende corregirlo")
